@@ -49,10 +49,27 @@
             text-decoration: none;
             transition: color 0.3s ease;
             font-size: 0.9rem;
+            position: relative;
         }
 
         .header-nav a:hover {
             color: #ffffff;
+        }
+
+        .header-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #E31937;
+            transition: width 0.3s ease;
+        }
+
+        .header-nav a:hover::after,
+        .header-nav a.active::after {
+            width: 100%;
         }
 
         .footer {
@@ -546,6 +563,17 @@
         #businessImpactChartTooltip.visible {
             opacity: 1;
         }
+
+        /* 锚点平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* 导航栏激活状态 */
+        .header-nav a.active {
+            color: #E31937;
+            font-weight: 500;
+        }
     </style>
     <script>
         // Tailwind 配置 (如果需要自定义)
@@ -957,6 +985,61 @@
 
             // 滚动时检查
             window.addEventListener('scroll', checkVisibility);
+
+            // 导航标签点击和滚动监听
+            const navLinks = document.querySelectorAll('.header-nav a');
+            const sections = document.querySelectorAll('section');
+
+            // 为所有导航链接添加点击事件
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // 获取目标部分的ID
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+
+                    if (targetSection) {
+                        // 平滑滚动到目标部分
+                        window.scrollTo({
+                            top: targetSection.offsetTop - 70, // 减去头部导航的高度
+                            behavior: 'smooth'
+                        });
+
+                        // 更新激活状态
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // 滚动时更新活动链接
+            function updateActiveLink() {
+                const scrollPosition = window.scrollY;
+
+                // 找出当前在视图中的部分
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100; // 提前一点激活
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        // 更新导航链接的活动状态
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === '#' + sectionId) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 监听滚动事件
+            window.addEventListener('scroll', updateActiveLink);
+
+            // 初始化时检查当前位置
+            updateActiveLink();
         });
     </script>
 </head>
@@ -978,15 +1061,15 @@
 
     <div class="bento-grid">
         <!-- 个人信息 -->
-        <motion.div class="bento-item motion-item span-2 span-2-lg" initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+        <motion.div class="bento-item motion-item span-2 span-2-lg" id="about" initial={{ opacity: 0, y: 50, scale: 0.95
+            }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
             <h1 class="text-5xl font-bold mb-2">Victor</h1>
             <h2 class="chinese-title highlight">独立全栈开发者</h2>
             <p class="text-text-muted mb-4">为您的项目提供专业的 Web / 管理系统 / 移动端 / AI 应用技术解决方案</p>
             <div class="flex items-center mb-2">
                 <i class="fas fa-envelope icon text-tesla-red"></i>
-                <a href="mailto:victor.dev@email.com"
-                    class="hover:text-tesla-red transition-colors">victor.dev@email.com</a>
+                <a href="mailto:zhu.cy@outlook.com"
+                    class="hover:text-tesla-red transition-colors">zhu.cy@outlook.com</a>
             </div>
             <div class="flex items-center space-x-4">
                 <a href="#" class="hover:text-tesla-red transition-colors" title="个人网站"><i
@@ -1008,8 +1091,8 @@
         </motion.div>
 
         <!-- 核心技能 -->
-        <motion.div class="bento-item motion-item span-3 span-4-lg" initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+        <motion.div class="bento-item motion-item span-3 span-4-lg" id="skills" section initial={{ opacity: 0, y: 50,
+            scale: 0.95 }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
             <h3 class="chinese-title">核心技能 <span class="english-text">/ Core Skills</span></h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4 skill-item-container">
                 <!-- 前端 -->
@@ -1081,8 +1164,8 @@
         </motion.div>
 
         <!-- 项目经验 1: 企业官网 -->
-        <motion.div class="bento-item motion-item span-2" initial={{ opacity: 0, y: 50, scale: 0.95 }} whileHover={{
-            scale: 1.02 }} transition={{ duration: 0.2 }}>
+        <motion.div class="bento-item motion-item span-2" id="projects" section initial={{ opacity: 0, y: 50, scale:
+            0.95 }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
             <h3 class="chinese-title">企业官网<span class="english-text">/ Corp Site</span></h3>
             <p class="text-text-muted mb-3">负责超过15个不同行业企业官网的前后端设计与开发，涵盖电商、内容、教育、金融等领域。</p>
             <ul class="list-disc list-inside text-text-muted space-y-1 text-sm mb-3">
@@ -1137,8 +1220,8 @@
         </motion.div>
 
         <!-- 合作方向 -->
-        <motion.div class="bento-item motion-item span-2 span-4-lg" initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+        <motion.div class="bento-item motion-item span-2 span-4-lg" id="collaboration" section initial={{ opacity: 0, y:
+            50, scale: 0.95 }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
             <h3 class="chinese-title mb-4">合作方向<span class="english-text">/ Collaboration Focus</span></h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1251,12 +1334,13 @@
         <!-- Contact CTA -->
         <motion.div
             class="bento-item motion-item span-4-lg span-3 flex flex-col md:flex-row justify-between items-center highlight-border border-2 p-8"
-            initial={{ opacity: 0, y: 50, scale: 0.95 }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+            id="contact" section initial={{ opacity: 0, y: 50, scale: 0.95 }} whileHover={{ scale: 1.02 }} transition={{
+            duration: 0.2 }}>
             <div>
                 <h3 class="text-3xl font-bold mb-2">探讨合作机会?</h3>
                 <p class="text-text-muted">Let's discuss how I can help your project succeed.</p>
             </div>
-            <a href="mailto:victor.dev@email.com"
+            <a href="mailto:zhu.cy@outlook.com"
                 class="mt-4 md:mt-0 px-8 py-3 highlight-bg text-white font-bold rounded-full hover:opacity-80 transition-opacity text-lg">
                 联系我 <i class="fas fa-arrow-right ml-2"></i>
             </a>
@@ -1267,7 +1351,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="social-links mb-4">
-            <a href="mailto:victor.dev@email.com" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="mailto:zhu.cy@outlook.com" title="Email"><i class="fas fa-envelope"></i></a>
             <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
             <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
             <a href="#" title="Website"><i class="fas fa-globe"></i></a>
